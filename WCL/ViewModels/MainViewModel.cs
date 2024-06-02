@@ -30,10 +30,12 @@ namespace WCL.ViewModels
         public MainViewModel()
         {
             User = new UserViewModel();
+            ErrorStrig = string.Empty;
 
             CommandLogIn = new Command(async () => await OnLogIn());
             CommandLogOut = new Command(async () => await OnLogOut());
             CommandRegistrationUser = new Command(async () => await OnRegistrationUser());
+            CommandClearErrorString = new Command(OnClearErrorString);
 
         }
         #endregion
@@ -49,6 +51,7 @@ namespace WCL.ViewModels
                 OnPropertyChanged("User");
             }
         }
+        public bool IsHasError => !string.IsNullOrEmpty(_errorStrig);
 
         private string? _errorStrig { get; set; }
         public string ErrorStrig
@@ -57,6 +60,7 @@ namespace WCL.ViewModels
             set
             {
                 _errorStrig = value;
+                OnPropertyChanged("IsHasError");
                 OnPropertyChanged("ErrorStrig");
             }
         }
@@ -88,23 +92,34 @@ namespace WCL.ViewModels
                         if (response.StatusCode.HasFlag(System.Net.HttpStatusCode.OK))
                         {    //пытаемся получить данные пользователя
                             response = await httpClient.GetAsync($"https://petstore.swagger.io/v2/user/{User.username}");
-                        }
-                        if (response.StatusCode.HasFlag(System.Net.HttpStatusCode.NotFound))
-                        {
-                            //если пользовател не еашло все сбрасываем
-                            User = new UserViewModel(); 
+
+                            if (response.StatusCode.HasFlag(System.Net.HttpStatusCode.NotFound))
+                            {
+                                //если пользовател не наашло все сбрасываем
+                                User = new UserViewModel();
+                                ErrorStrig = "Ошибка входа в систему";
+
+                            }
+                            else
+                            {
+                                //получаем тело ответа в формате сериализованного обьекта
+                                var json = await response.Content.ReadAsStringAsync();
+                                //присваем десериализовванный обьект пользователя 
+                                User = JsonSerializer.Deserialize<UserViewModel>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new UserViewModel();
+                                //если есть id значит получили пользователя и считаем вход успешеым
+                                if (User.id != 0) User.IsLogIn = true;
+                            }
                         }
                         else
                         {
-                            //получаем тело ответа в формате сериализованного обьекта
-                            var json = await response.Content.ReadAsStringAsync();
-                            //присваем десериализовванный обьект пользователя 
-                            User = JsonSerializer.Deserialize<UserViewModel>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new UserViewModel();
-                            //если есть id значит получили пользователя и считаем вход успешеым
-                            if (User.id != 0) User.IsLogIn = true;
+                            ErrorStrig = "Ошибка входа в систему, проверьте логин и пароль";
                         }
 
                     }
+                }
+                else
+                {
+                    ErrorStrig = "Введите логин и пароль";
                 }
             }
             catch 
@@ -136,6 +151,20 @@ namespace WCL.ViewModels
                         User = new UserViewModel();
                     }
                 }
+            }
+            catch
+            {
+                ErrorStrig = "Ошибка выхода из системы";
+            }
+        }
+
+        /// <summary> очистка строки ошибки</summary>
+        public ICommand CommandClearErrorString { get; set; }
+        private void OnClearErrorString()
+        {
+            try
+            {
+                ErrorStrig = string.Empty;
             }
             catch
             {

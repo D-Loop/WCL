@@ -441,7 +441,23 @@
 
         <!--Start footer-->
         <Grid Grid.Row="2" Background="#202020">
+            <Grid >
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsHasError}" Value="true">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                
+                <TextBlock Margin="10 3 5 0" Foreground="DarkRed" Text="{Binding ErrorStrig}"/>
+                <Button BorderThickness="0" Background="#202020" Foreground="DarkRed" Cursor="Hand"
+                        Command="{Binding CommandClearErrorString}" Style="{StaticResource TittleButton}" Content="✕" HorizontalAlignment="Right"/>
             
+            </Grid>
         </Grid>
         <!--end footer-->
 
