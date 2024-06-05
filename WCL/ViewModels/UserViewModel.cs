@@ -33,11 +33,11 @@ namespace WCL.ViewModels
                 OnPropertyChanged("IsLogIn");
             }
         }
-
+        [JsonIgnore]
         /// <summary>Текстовое представление индефикатора</summary>
         public string idVM => id == 0 ? "- - -" : id.ToString();
         /// <summary>Уникальный индефикатор пользователя</summary>
-        public new int id
+        public new long id
         {
             get => base.id;
             set
@@ -66,6 +66,7 @@ namespace WCL.ViewModels
                 OnPropertyChanged("firstName");
             }
         }
+
         /// <summary>Пароль</summary>
         public new string password
         {
@@ -76,6 +77,18 @@ namespace WCL.ViewModels
                 OnPropertyChanged("password");
             }
         }
+
+        /// <summary>Повторный пароль</summary>
+        public new string RepeatedPassword
+        {
+            get => base.RepeatedPassword ?? string.Empty;
+            set
+            {
+                base.RepeatedPassword = value;
+                OnPropertyChanged("RepeatedPassword");
+            }
+        }
+
         /// <summary>Фамилия</summary>
         public new string lastName
         {
@@ -111,9 +124,11 @@ namespace WCL.ViewModels
         #endregion
 
         #region Validate
+
         /// <summary> Валидация для входа в систему </summary>
         public void ValidateForLogIn()
         {
+            IsValedEnable = true;
             OnPropertyChanged(nameof(username));
             OnPropertyChanged(nameof(password));
         }
@@ -121,13 +136,17 @@ namespace WCL.ViewModels
         /// <summary> Валидация для регистрации</summary>
         public void ValidateForReg()
         {
+            IsValedEnable = true;
             OnPropertyChanged(nameof(username));
+            OnPropertyChanged(nameof(password));
+            OnPropertyChanged(nameof(RepeatedPassword));
             OnPropertyChanged(nameof(firstName));
             OnPropertyChanged(nameof(lastName));
+            OnPropertyChanged(nameof(email));
             OnPropertyChanged(nameof(phone));
-            OnPropertyChanged(nameof(password));
         }
 
+        /// <summary>Включена ли валидация </summary>
         public bool IsValedEnable { get; set; }
         public string this[string columnName]
         {
@@ -136,11 +155,11 @@ namespace WCL.ViewModels
                 //если не хотим валидировать данные то сразу выходим
                 if(!IsValedEnable) return string.Empty;
 
-                Error = ValidateFields(columnName);
-                return Error;
+                var error = ValidateFields(columnName);
+                return error;
             }
         }
-        public string? Error { get; set; }
+        public string Error { get; set; }
         #endregion
 
 

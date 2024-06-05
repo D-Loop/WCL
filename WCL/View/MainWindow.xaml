@@ -4,13 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WCL.View" 
-        Name="Main"  ResizeMode="NoResize"
+        Name="Main"  ResizeMode="CanResizeWithGrip"
         xmlns:dataContext="clr-namespace:WCL.ViewModels"
-        mc:Ignorable="d" WindowStyle="None" Background="#262626" 
-        Title="MainWindow" Height="500" Width="600">
-    <Window.DataContext>
-        <dataContext:MainViewModel />
-    </Window.DataContext>
+        mc:Ignorable="d" WindowStyle="None" 
+        Background="Transparent" 
+        AllowsTransparency="True"
+        Title="MainWindow" Height="600" Width="600">
     <Window.Resources>
 
         <Style x:Key="TitleStyle" TargetType="TextBlock">
@@ -48,18 +47,18 @@
             <Setter Property="Background" Value="#202020"/>
             <Setter Property="BorderThickness" Value="0"/>
         </Style>
-        
+
         <Style TargetType="TabItem">
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TabItem"  >
                         <StackPanel Name="Panel" Height="30" Margin="0 -5 5 0">
                             <ContentPresenter HorizontalAlignment="Center"
-                              ContentSource="Header" >
+                           ContentSource="Header" >
                                 <ContentPresenter.ContentTemplate>
                                     <DataTemplate >
                                         <TextBlock Name="Title" Text="{Binding}" Style="{StaticResource TitleStyle}"  
-                                                   Padding="5 0 5 5" Foreground="#999" FontSize="13"/>
+                                                Padding="5 0 5 5" Foreground="#999" FontSize="13"/>
                                     </DataTemplate>
                                 </ContentPresenter.ContentTemplate>
                             </ContentPresenter>
@@ -139,26 +138,21 @@
 
         <Style x:Key="MaxMinButton" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
 
+            <Setter Property="ToolTip" Value="Свернуть"/>
+            <Setter Property="Content" Value="🗖"/>
+            <Setter Property="Margin" Value="0 3 3 0"/>
             <Setter Property="Width" Value="20"/>
             <Setter Property="Height" Value="20"/>
-            <Setter Property="Margin" Value="0 3 3 0"/>
-            <Setter Property="ToolTip" Value="Свернуть"/>
-            <Setter Property="Content" Value="□"/>
-            <Setter Property="Padding" Value="0 -5 0 0"/>
-            <Setter Property="FontSize" Value="18"/>
-
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Grid VerticalAlignment="Top" >
-                            <Border Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" >
-                                <ContentPresenter Margin="0 -5 0 0" HorizontalAlignment="Center" VerticalAlignment="Top" />
-                            </Border>
-                        </Grid>
+                        <Border Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}">
+                            <ContentPresenter   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
                         <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="#202020"/>
-                                    <Setter Property="BorderBrush" Value="Gray"/>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#202020"/>
+                                <Setter Property="BorderBrush" Value="Gray"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -167,11 +161,11 @@
 
             <Style.Triggers>
                 <DataTrigger Binding="{Binding ElementName=Main, Path=WindowState}" Value="Maximized">
-                    <Setter Property="FontSize" Value="14"/>
-                    <Setter Property="Padding" Value="0"/>
+                    <Setter Property="Content" Value="□"/>
                     <Setter Property="ToolTip" Value="Восстановить"/>
                 </DataTrigger>
             </Style.Triggers>
+            
         </Style>
 
         <Style x:Key="BaseTextBoxStyle" TargetType="TextBox">
@@ -179,16 +173,15 @@
             <Setter Property="Padding" Value="5"/>
             <Setter Property="Background" Value="#202020"/>
             <Setter Property="Foreground" Value="#999"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="BorderBrush" Value="#3c3c3e"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
             <Setter Property="FontSize" Value="12"/>
-            <Setter Property="SelectionBrush" Value="#555555"/>
+            <Setter Property="SelectionBrush" Value="#994c0099"/>
             <Setter Property="Validation.ErrorTemplate">
                 <Setter.Value>
                     <ControlTemplate>
                         <DockPanel LastChildFill="True">
                             <TextBlock  Text ="{Binding ElementName=AdornedElement, Path=AdornedElement.(Validation.Errors)[0].ErrorContent}"
-                                       Foreground="DarkRed" DockPanel.Dock="Bottom"/>
+                        Foreground="DarkRed" DockPanel.Dock="Bottom"/>
                             <Border BorderBrush="DarkRed" BorderThickness="1">
                                 <AdornedElementPlaceholder/>
                             </Border>
@@ -197,45 +190,133 @@
                 </Setter.Value>
             </Setter>
             
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border 
+                                CornerRadius="3" 
+                                Background="{TemplateBinding Background}"
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                BorderBrush="{TemplateBinding BorderBrush}">
+                            <ScrollViewer x:Name="PART_ContentHost" VerticalScrollBarVisibility="Disabled"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="BorderBrush" Value="DarkBlue"/>
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="BorderThickness" Value="1"/>
+                                <Setter Property="BorderBrush" Value="#4c0099"/>
+                                <Setter Property="Background" Value="#333333"/>
+                            </Trigger>
+                            <Trigger Property="Validation.HasError" Value="True">
+                                <Setter Property="ToolTip"
+                                    Value="{Binding RelativeSource={RelativeSource Self}, 
+                                        Path=(Validation.Errors)[0].ErrorContent}"/>
+                                <Setter Property="BorderBrush" Value="DarkRed"/>
+                                <Setter Property="BorderThickness" Value="1"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="BorderBrush" Value="#555555"/>
+                    <Setter Property="BorderBrush" Value="#4c0099"/>
                 </Trigger>
                 <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="BorderThickness" Value="1"/>
                     <Setter Property="BorderBrush" Value="#4c0099"/>
                     <Setter Property="Background" Value="#333333"/>
                 </Trigger>
+                <Trigger Property="Validation.HasError" Value="True">
+                    <Setter Property="ToolTip"
+                        Value="{Binding RelativeSource={RelativeSource Self}, 
+                            Path=(Validation.Errors)[0].ErrorContent}"/>
+                    <Setter Property="BorderThickness" Value="1"/>
+                    <Setter Property="BorderBrush" Value="DarkRed"/>
+                </Trigger>
             </Style.Triggers>
+            
+            
+            
         </Style>
 
     </Window.Resources>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="25"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="25"/>
-        </Grid.RowDefinitions>
-        
-        <!--start header-->
-        <Grid Grid.Row="0" Background="#202020">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+    <Window.Style>
+        <Style TargetType="Window">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Window">
+                        <Border CornerRadius="5" Background="#262626" >
+                            <Grid >
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="30"/>
+                                </Grid.RowDefinitions>
+                                
+                                <!--start header-->
+                                <Border  Grid.Row="0" CornerRadius="3 3 0 0" Background="#202020"
+                                         BorderThickness="0"  MouseLeftButtonDown="Window_Move">
+                                    <Grid >
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Column="0"  Text="MainWindow" Style="{StaticResource TitleStyle}"/>
-            
-            <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right">
-                <Button ToolTip="Свернуть" Content="__"  Style="{StaticResource TittleButton}"/>
-                <Button Style="{StaticResource MaxMinButton}"/>
-                <Button ToolTip="Закрыть" Content="✕"  Style="{StaticResource TittleButton}"/>
-            </StackPanel>
-        </Grid>
-        <!--end heared-->
+                                        <TextBlock Grid.Column="0"  Text="MainWindow" Style="{StaticResource TitleStyle}"/>
+
+                                        <StackPanel Orientation="Horizontal" Grid.Column="1" Margin="0 2 3 0" HorizontalAlignment="Right">
+                                            <Button ToolTip="Свернуть" Command="{Binding CommandMinimizeWindow}" Content="__"  Style="{StaticResource TittleButton}"/>
+                                            <Button Style="{StaticResource MaxMinButton}" Command="{Binding CommandMaximizeRestoreWindow}"/>
+                                            <Button ToolTip="Закрыть" Content="✕"  Command="{Binding CommandCloseWindow}" Style="{StaticResource TittleButton}"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                                <!--end header-->
+
+                                <ContentPresenter Grid.Row="1"/>
+
+                                <!--Start footer-->
+                                <Border Grid.Row="2" CornerRadius="0 0 3 3" Background="#202020" BorderThickness="0">
+                                    <Grid  >
+                                        <Grid >
+                                            <Grid.Style>
+                                                <Style TargetType="Grid">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsHasError}" Value="true">
+                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Grid.Style>
+
+                                            <TextBlock Margin="10 7 5 0" Foreground="DarkRed" Text="{Binding ErrorStrig}"/>
+                                            <Button BorderThickness="1" Background="#202020" Margin="0 5 5 5" BorderBrush="DarkRed"  Foreground="DarkRed" Cursor="Hand"
+                                                Command="{Binding CommandClearErrorString}" VerticalAlignment="Center" Style="{StaticResource TittleButton}" Content="✕" HorizontalAlignment="Right"/>
+                                        </Grid>
+                                    </Grid>
+                                </Border>
+                                <!--end footer-->
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Style>
         
+    <Window.DataContext>
+        <dataContext:MainViewModel />
+    </Window.DataContext>
+   
+    <Grid>
         <!--Start data view-->
-        <Grid Grid.Row="1">
+        <Grid>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*"/>
@@ -249,10 +330,11 @@
 
                 <Border Grid.Column="0" Grid.RowSpan="2" Grid.Row="0" Style="{StaticResource BaseBorderStyle}" >
                     <TabControl>
-                        <!-- Первое окно с отображением данных пользователя при успещно -->
+                        <!-- Первое окно с отображением данных пользователя при успешно -->
                         <TabItem Header="Пользователь">
-                            <StackPanel>
-                                <Border Background="#262626" CornerRadius="0 0 5 5" Height="375">
+                            <Grid >
+                                <!--Log in-->
+                                <Border Background="#262626" CornerRadius="0 0 5 5" VerticalAlignment="Stretch">
                                     <Border.Style>
                                         <Style TargetType="Border">
                                             <Setter Property="Visibility" Value="Visible"/>
@@ -266,8 +348,10 @@
                                     <TextBlock FontWeight="Bold" Margin="10 5 5 0" Style="{StaticResource HeaderStyle}" VerticalAlignment="Top"
                                                Text="Просьба авторизироваться или зарегистрироваться в системе." TextWrapping="Wrap" />
                                 </Border>
-                                
-                                <Border Background="#262626" CornerRadius="0 0 5 5" Height="380">
+                                <!--Log in-->
+
+                                <!--LogOut-->
+                                <Border Background="#262626" CornerRadius="0 0 5 5">
                                     <Border.Style>
                                         <Style TargetType="Border">
                                             <Setter Property="Visibility" Value="Collapsed"/>
@@ -307,23 +391,24 @@
                                     </Grid>
 
                                 </Border>
+                                <!--LogOut-->
 
-                            </StackPanel>
+                            </Grid>
                         </TabItem>
-                        
-                        <!--Раздел с данными обо мне-->
+
+                        <!--Раздел с данными разработчика-->
                         <TabItem Header="Разработчик">
                             <Border Background="#262626" CornerRadius="0 0 5 5">
                                 <StackPanel>
-                                    <TextBlock Style="{StaticResource TitleStyle}"  FontSize="13" TextAlignment="Justify" 
-                                               Width="335" Padding="0 5 0 0" VerticalAlignment="Top" TextWrapping="Wrap">
+                                    <TextBlock Style="{StaticResource TitleStyle}" TextAlignment="Justify" FontSize="13" 
+                                               Padding="0 5 0 0" Margin="10 0 5 0"  VerticalAlignment="Top" TextWrapping="Wrap">
                                         Данное приложение является тестовым заданием и разработано 
                                         Никитой Лобасом специально для вакансии .Net разработчика.
                                         Согласно полученому техническому заданию.
                                     </TextBlock>
-                                    <Label Background="#999" Height="1" Margin="10 10 10 0"/>
+                                    <Label Background="#999" Height="1"  Margin="10 10 10 0"/>
                                     <TextBlock Style="{StaticResource TitleStyle}" TextAlignment="Justify" FontSize="13" 
-                                               Padding="0 5 0 0" Width="335" VerticalAlignment="Top" TextWrapping="Wrap">
+                                               Padding="0 5 0 0" Margin="10 0 5 0"  VerticalAlignment="Top" TextWrapping="Wrap">
                                         На момент разработки имею больше 3-х лет опыта работы на C# с использованием WPF и шаблона MVVM. 
                                         Также работал на протяжении всего этого времени с MySQL на уровне использования транзакций, хранимых процедур, проектирования таблиц и связей между ними.
                                         Работал с клиент-серверной архетиктурой.
@@ -334,11 +419,10 @@
                     </TabControl>
                 </Border>
 
-                <Border x:Name="userData" Grid.Column="1" Grid.RowSpan="2" Grid.Row="0" Style="{StaticResource BaseBorderStyle}" 
-                        >
-                    <StackPanel>
+                <Border Grid.Column="1" Grid.RowSpan="2"  Grid.Row="0" Style="{StaticResource BaseBorderStyle}">
+                    <Grid VerticalAlignment="Stretch">
                         <!--Log in-->
-                        <Grid Focusable="True" KeyboardNavigation.IsTabStop="True">
+                        <Grid >
                             <Grid.Style>
                                 <Style TargetType="Grid">
                                     <Setter Property="Visibility" Value="Visible"/>
@@ -349,10 +433,11 @@
                                     </Style.Triggers>
                                 </Style>
                             </Grid.Style>
+                            
                             <Grid.RowDefinitions>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="auto"/>
                                 <RowDefinition Height="*"/>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="230"/>
                             </Grid.RowDefinitions>
 
                             <StackPanel Width="110" Grid.Row="0" >
@@ -371,28 +456,27 @@
                                 </TextBlock>
                             </StackPanel>
 
-                            <Border Grid.Row="1" Background="#262626" Padding="5" Style="{StaticResource BaseBorderStyle}" >
+                            <Border Grid.Row="1" CornerRadius="0 0 5 5" Background="#262626" Padding="5" Margin="10 5 10 10 " Style="{StaticResource BaseBorderStyle}" >
                                 <StackPanel>
                                     <TextBlock Text="Логин" Style="{StaticResource TitleStyle}" FontSize="9" HorizontalAlignment="Left" Margin="5 0 0 0"/>
                                     <TextBox Text="{Binding User.username,ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" Style="{StaticResource BaseTextBoxStyle}" />
                                     <TextBlock Text="Пароль" Style="{StaticResource TitleStyle}" FontSize="9" HorizontalAlignment="Left" Margin="5 0 0 0"/>
-                                    <TextBox Text="{Binding User.password, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource BaseTextBoxStyle}" /> 
+                                    <TextBox KeyDown="TextBox_KeyDown" Text="{Binding User.password, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource BaseTextBoxStyle}" /> 
                                     <Button Content="Войти" Style="{StaticResource DataButton}" Foreground="#999" Command="{Binding CommandLogIn}"/>
                                 </StackPanel>
                             </Border>
-
-                            <Button Margin="15 0" Content="Регистрация" Grid.Row="2" VerticalAlignment="Bottom">
+                            <Button HorizontalAlignment="Stretch" Margin="10 " Content="Регистрация" Command="{Binding CommandChangeVisibilityWindowRegistration}" Grid.Row="2" VerticalAlignment="Bottom">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource DataButton}">
                                         <Setter Property="Background" Value="#262626"/>
                                     </Style>
                                 </Button.Style>
                             </Button>
-
                         </Grid>
-                    
+                        <!--Log in-->
+
                         <!--LogOut-->
-                        <Grid >
+                        <Grid VerticalAlignment="Stretch" >
                             <Grid.Style>
                                 <Style TargetType="Grid">
                                     <Setter Property="Visibility" Value="Collapsed"/>
@@ -403,8 +487,9 @@
                                     </Style.Triggers>
                                 </Style>
                             </Grid.Style>
+                            
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
 
@@ -424,42 +509,105 @@
                                 </TextBlock>
                             </StackPanel>
 
-                            <Border Grid.Row="1" Background="#262626" Padding="5" Style="{StaticResource BaseBorderStyle}">
+                            <Border CornerRadius="0 0 5 5"  Grid.Row="1" VerticalAlignment="Stretch" Background="#262626" Padding="5" Style="{StaticResource BaseBorderStyle}">
                                 <StackPanel >
                                     <Button Command="{Binding CommandLogOut}" Content="Выйти" Margin="0 0 0 0" Style="{StaticResource DataButton}" />
                                 </StackPanel>
                             </Border>
 
                         </Grid>
-                    
-                    </StackPanel>
-                </Border>
+                        <!--LogOut-->
 
+                    </Grid>
+                </Border>
             </Grid>
         </Grid>
         <!--end data view-->
 
-        <!--Start footer-->
-        <Grid Grid.Row="2" Background="#202020">
-            <Grid >
-                <Grid.Style>
-                    <Style TargetType="Grid">
-                        <Setter Property="Visibility" Value="Collapsed"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsHasError}" Value="true">
-                                <Setter Property="Visibility" Value="Visible"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Grid.Style>
-                
-                <TextBlock Margin="10 3 5 0" Foreground="DarkRed" Text="{Binding ErrorStrig}"/>
-                <Button BorderThickness="0" Background="#202020" Foreground="DarkRed" Cursor="Hand"
-                        Command="{Binding CommandClearErrorString}" Style="{StaticResource TittleButton}" Content="✕" HorizontalAlignment="Right"/>
-            
-            </Grid>
-        </Grid>
-        <!--end footer-->
+        <!--registration-->
+        <Grid Background="#99202020" Visibility="{Binding VisibilityWindowRegistration}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="490"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
+            <Grid Grid.Column="1" Grid.Row="1" Background="#262626">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
+
+                <!--start header-->
+                <Border  Grid.Row="0" CornerRadius="3 3 0 0" Background="#202020"
+                                BorderThickness="0"  MouseLeftButtonDown="Window_Move">
+                    <Grid >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0" Text="Форма для регистрации" FontSize="14" Style="{StaticResource TitleStyle}"/>
+                        <StackPanel Orientation="Horizontal" Grid.Column="1" Margin="0 2 3 0" HorizontalAlignment="Right">
+                            <Button ToolTip="Закрыть" Content="✕"  Command="{Binding CommandChangeVisibilityWindowRegistration}" Style="{StaticResource TittleButton}"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                <!--end heared-->
+    
+                <Border Grid.Row="1" CornerRadius="0 0 5 5" Background="#262626" Padding="5" Margin="10 5 10 10 " Style="{StaticResource BaseBorderStyle}" >
+                    <StackPanel>
+                        <TextBlock Text="Логин" Style="{StaticResource TitleStyle}" FontSize="11" HorizontalAlignment="Left" Margin="5 0 0 0"/>
+                        <TextBox Text="{Binding NewUser.username,ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" Style="{StaticResource BaseTextBoxStyle}" />
+                        <TextBlock Text="Пароль" Style="{StaticResource TitleStyle}" FontSize="11" HorizontalAlignment="Left" Margin="5 0 0 0"/>
+                        <TextBox Text="{Binding NewUser.password, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource BaseTextBoxStyle}" />
+                        <TextBlock Text="Повторите пароль" Style="{StaticResource TitleStyle}" FontSize="11" HorizontalAlignment="Left" Margin="5 0 0 0"/>
+                        <TextBox Text="{Binding NewUser.RepeatedPassword, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource BaseTextBoxStyle}" />
+                        <TextBlock Text="Имя" Style="{StaticResource TitleStyle}" FontSize="11" HorizontalAlignment="Left" Margin="5 0 0 0"/>
+                        <TextBox Text="{Binding NewUser.firstName, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource BaseTextBoxStyle}" />
+                        <TextBlock Text="Фамилия" Style="{StaticResource TitleStyle}" FontSize="11" HorizontalAlignment="Left" Margin="5 0 0 0"/>
+                        <TextBox Text="{Binding NewUser.lastName, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource BaseTextBoxStyle}" />
+                        <TextBlock Text="Телефон" Style="{StaticResource TitleStyle}" FontSize="11" HorizontalAlignment="Left" Margin="5 0 0 0"/>
+                        <TextBox Text="{Binding NewUser.phone, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource BaseTextBoxStyle}" />
+                        <TextBlock Text="Почта" Style="{StaticResource TitleStyle}" FontSize="11" HorizontalAlignment="Left" Margin="5 0 0 0"/>
+                        <TextBox KeyDown="TextBox_KeyDown" Text="{Binding NewUser.email, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource BaseTextBoxStyle}" />
+
+                        <Button Content="Регистрация" Style="{StaticResource DataButton}" Foreground="#999" Command="{Binding CommandRegistrationUser}"/>
+                    </StackPanel>
+                </Border>
+
+                <!--Start footer-->
+                <Border Grid.Row="2" CornerRadius="0 0 3 3" Background="#202020" BorderThickness="0">
+                    <Grid  >
+                        <Grid >
+                            <Grid.Style>
+                                <Style TargetType="Grid">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsHasErrorReg}" Value="true">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Grid.Style>
+
+                            <TextBlock Margin="10 7 5 0" Foreground="DarkRed" Text="{Binding ErrorStringReg}"/>
+                            <Button BorderThickness="1" Background="#202020" Margin="0 5 5 5" BorderBrush="DarkRed"  Foreground="DarkRed" Cursor="Hand"
+                                Command="{Binding CommandClearErrorString}" VerticalAlignment="Center" Style="{StaticResource TittleButton}" Content="✕" HorizontalAlignment="Right"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+                <!--end footer-->
+
+            </Grid>
+            
+        </Grid>
+        <!--registration-->
     </Grid>
 </Window>

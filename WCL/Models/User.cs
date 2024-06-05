@@ -14,17 +14,18 @@ namespace WCL.Models
         #region Constructor
         public User() 
         {
-
+            IsNullError = true;
         }   
         #endregion
 
         #region Properties
-        public int id { get; set; }
+        public long id { get; set; }
         public string? username { get; set; }
         public string? firstName { get; set; }
         public string? lastName { get; set; }
         public string? email { get; set; }
         public string? password { get; set; }
+        public string? RepeatedPassword { get; set; }
         public string? phone { get; set; }
         #endregion
 
@@ -36,11 +37,13 @@ namespace WCL.Models
             
             switch (field)
             {
-                case nameof(username)    when string.IsNullOrEmpty(username):    result = "Требуется ввести имя";     break;
-                case nameof(firstName)   when string.IsNullOrEmpty(firstName):   result = "Требуется ввести имя";     break;
-                case nameof(lastName)    when string.IsNullOrEmpty(lastName):    result = "Требуется ввести фамилию"; break;
-                case nameof(email)       when string.IsNullOrEmpty(email):       result = "Требуется ввести почту";   break;
-                case nameof(password)    when string.IsNullOrEmpty(password):    result = "Требуется ввести пароль";  break;
+                case nameof(username)    when string.IsNullOrEmpty(username):     result = "Требуется ввести имя";     break;
+                case nameof(firstName)   when string.IsNullOrEmpty(firstName):    result = "Требуется ввести имя";     break;
+                case nameof(lastName)    when string.IsNullOrEmpty(lastName):     result = "Требуется ввести фамилию"; break;
+                case nameof(email)       when string.IsNullOrEmpty(email):        result = "Требуется ввести почту";   break;
+                case nameof(password)    when string.IsNullOrEmpty(password):     result = "Требуется ввести пароль";  break;
+                case nameof(RepeatedPassword) when password != RepeatedPassword: result = "Требуется ввести одинаковые";  break;
+                case nameof(RepeatedPassword) when string.IsNullOrEmpty(RepeatedPassword): result = "Требуется повторно ввести пароль";  break;
                 case nameof(phone) when string.IsNullOrEmpty(phone): result = "Требуется ввести номер телефона"; break;
             }
 
